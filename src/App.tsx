@@ -8,7 +8,7 @@ import DesignGuide from './pages/DesignGuide'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="ai-native-article">
       <div className="min-h-screen flex flex-col bg-surface">
         <Header />
         <main className="flex-1 pt-16">
