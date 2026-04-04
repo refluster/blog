@@ -12,5 +12,5 @@
     "noEmit": true,
     "strict": true
   },
-  "include": ["vite.config.ts", "tailwind.config.ts"]
+  "include": ["vite.config.ts", "tailwind.config.ts", "src/config/site.ts"]
 }
