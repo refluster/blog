@@ -8,11 +8,20 @@
  * Usage: node --env-file=.env scripts/fetch-notion.mjs
  */
 
-import { writeFileSync, mkdirSync, existsSync } from 'fs'
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+
+// Load .env if present (local dev). In CI, env vars are injected by the runner.
+const __envPath = join(__dirname, '..', '.env')
+if (existsSync(__envPath)) {
+  for (const line of readFileSync(__envPath, 'utf8').split('\n')) {
+    const match = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/)
+    if (match && !process.env[match[1]]) process.env[match[1]] = match[2].trim()
+  }
+}
 const ROOT = join(__dirname, '..')
 
 const NOTION_API_KEY = process.env.NOTION_API_KEY

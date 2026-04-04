@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "fetch-notion": "node --env-file=.env scripts/fetch-notion.mjs"
+    "fetch-notion": "node scripts/fetch-notion.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
