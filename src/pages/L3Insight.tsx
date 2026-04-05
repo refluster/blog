@@ -20,8 +20,6 @@ export default function L3Insight() {
   const [l2Entries, setL2Entries] = useState<L2Entry[]>([])
   const [l3Entries, setL3Entries] = useState<L3Entry[]>([])
   const [selectedL2Ids, setSelectedL2Ids] = useState<string[]>([])
-  const [title, setTitle] = useState('')
-  const [category, setCategory] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -49,8 +47,8 @@ export default function L3Insight() {
   }
 
   async function handleCreate() {
-    if (!title || !category || selectedL2Ids.length === 0) {
-      alert('Please fill in all fields and select articles')
+    if (selectedL2Ids.length === 0) {
+      alert('Please select articles')
       return
     }
 
@@ -60,15 +58,11 @@ export default function L3Insight() {
         method: 'POST',
         body: JSON.stringify({
           action: 'L3_CREATE',
-          title,
-          category,
           l2EntryIds: selectedL2Ids,
         }),
       })
       const data = await response.json()
       if (data.success) {
-        setTitle('')
-        setCategory('')
         setSelectedL2Ids([])
         await loadEntries()
       } else {
@@ -102,32 +96,6 @@ export default function L3Insight() {
           <div className="col-span-12 lg:col-span-6 bg-surface-container-low p-8">
             <h2 className="text-2xl font-black tracking-tighter uppercase mb-8">New Insight Article</h2>
             <div className="space-y-6">
-              <div>
-                <label className="text-[10px] font-bold tracking-widest text-outline uppercase block mb-2">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  placeholder="Insight article title"
-                  value={title}
-                  onChange={e => setTitle(e.target.value)}
-                  className="w-full bg-transparent border-b border-outline pb-2 text-base focus:outline-none focus:border-primary"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold tracking-widest text-outline uppercase block mb-2">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  placeholder="E.g., AI STRATEGY × ORG DESIGN"
-                  value={category}
-                  onChange={e => setCategory(e.target.value)}
-                  className="w-full bg-transparent border-b border-outline pb-2 text-base focus:outline-none focus:border-primary"
-                />
-              </div>
-
               <div>
                 <label className="text-[10px] font-bold tracking-widest text-outline uppercase block mb-4">
                   Select Blog Articles

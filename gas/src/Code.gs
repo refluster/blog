@@ -137,9 +137,17 @@ function githubRequest(method, path, token, body) {
 }
 
 function githubReadManifest(token) {
-  const result = githubRequest('GET', '/contents/public/posts/manifest.json?ref=gh-pages', token);
-  const content = Utilities.newBlob(Utilities.base64Decode(result.content)).getDataAsString();
-  return JSON.parse(content);
+  try {
+    const result = githubRequest('GET', '/contents/public/posts/manifest.json?ref=gh-pages', token);
+    const content = Utilities.newBlob(Utilities.base64Decode(result.content)).getDataAsString();
+    return JSON.parse(content);
+  } catch (e) {
+    // If manifest doesn't exist, return empty array
+    if (e.message && e.message.includes('404')) {
+      return [];
+    }
+    throw e;
+  }
 }
 
 function githubUpdateManifest(entry, token) {
@@ -147,15 +155,27 @@ function githubUpdateManifest(entry, token) {
   manifest.push(entry);
   manifest.sort((a, b) => b.date.localeCompare(a.date));
 
-  const result = githubRequest('GET', '/contents/public/posts/manifest.json?ref=gh-pages', token);
-  const sha = result.sha;
-
-  githubRequest('PUT', '/contents/public/posts/manifest.json', token, {
-    message: `Add article: ${entry.title}`,
-    content: Utilities.base64Encode(JSON.stringify(manifest, null, 2)),
-    branch: 'gh-pages',
-    sha,
-  });
+  try {
+    const result = githubRequest('GET', '/contents/public/posts/manifest.json?ref=gh-pages', token);
+    const sha = result.sha;
+    githubRequest('PUT', '/contents/public/posts/manifest.json', token, {
+      message: `Add article: ${entry.title}`,
+      content: Utilities.base64Encode(JSON.stringify(manifest, null, 2)),
+      branch: 'gh-pages',
+      sha,
+    });
+  } catch (e) {
+    // If file doesn't exist, create it without sha
+    if (e.message && e.message.includes('404')) {
+      githubRequest('PUT', '/contents/public/posts/manifest.json', token, {
+        message: `Add article: ${entry.title}`,
+        content: Utilities.base64Encode(JSON.stringify(manifest, null, 2)),
+        branch: 'gh-pages',
+      });
+    } else {
+      throw e;
+    }
+  }
 }
 
 function githubCreatePost(slug, mdContent, token) {
@@ -345,10 +365,21 @@ function handleL3Create(data, config) {
   const l2Titles = selectedL2.map(p => p.properties.Name.title[0]?.plain_text || '');
   const l2Summaries = selectedL2.map(p => p.properties['Contents Summary']?.rich_text[0]?.plain_text || '');
   const l2SourceUrls = selectedL2.map(p => p.properties['Source URLs']?.url || '');
+  const l2Categories = selectedL2.map(p => p.properties['Sub Category']?.rich_text[0]?.plain_text || '');
 
   const sourceList = l2Titles.map((t, i) => `- ${t}: ${l2Summaries[i].substring(0, 200)}...`).join('\n');
-  const prompt = `Based on these blog articles about AI:\n\n${sourceList}\n\nWrite a deep-dive insight article (1500-2000 words) that synthesizes cross-cutting themes, provides strategic insights, includes concrete examples, and offers actionable recommendations. Category: ${data.category}\n\nFirst line should be abstract (2-3 sentences), rest is the full article. Format as Markdown.`;
-  const insightContent = azureGenerateText(prompt, config.azure_openapi_key);
+
+  // Generate title and category from the blog articles
+  const titleCategoryPrompt = `Based on these blog article titles about AI:\n\n${l2Titles.join('\n')}\n\nGenerate:\n1. A creative insight article title (10-20 words) that synthesizes the common theme\n2. A category in "THEME1 × THEME2" format\n\nFormat your response as:\nTITLE: [title]\nCATEGORY: [category]`;
+  const titleCategoryResponse = azureGenerateText(titleCategoryPrompt, config.azure_openapi_key);
+
+  const titleMatch = titleCategoryResponse.match(/TITLE:\s*(.+?)(?:\n|$)/);
+  const categoryMatch = titleCategoryResponse.match(/CATEGORY:\s*(.+?)(?:\n|$)/);
+  const generatedTitle = titleMatch ? titleMatch[1].trim() : l2Titles.join(' + ');
+  const generatedCategory = categoryMatch ? categoryMatch[1].trim() : l2Categories.join(', ');
+
+  const contentPrompt = `Based on these blog articles about AI:\n\n${sourceList}\n\nWrite a deep-dive insight article (1500-2000 words) that synthesizes cross-cutting themes, provides strategic insights, includes concrete examples, and offers actionable recommendations. Category: ${generatedCategory}\n\nFirst line should be abstract (2-3 sentences), rest is the full article. Format as Markdown.`;
+  const insightContent = azureGenerateText(contentPrompt, config.azure_openapi_key);
 
   // Extract abstract (first 200 chars)
   const abstract = insightContent.substring(0, 200);
@@ -357,9 +388,9 @@ function handleL3Create(data, config) {
   const blocks = markdownToNotionBlocks(insightContent);
 
   const properties = {
-    'Title': { title: [{ text: { content: data.title } }] },
+    'Title': { title: [{ text: { content: generatedTitle } }] },
     'Abstract': { rich_text: [{ text: { content: abstract } }] },
-    'Category': { rich_text: [{ text: { content: data.category } }] },
+    'Category': { rich_text: [{ text: { content: generatedCategory } }] },
     'Source Article URLs': { rich_text: [{ text: { content: l2SourceUrls.join(', ') } }] },
   };
 
@@ -374,10 +405,10 @@ function handleL3Create(data, config) {
     success: true,
     data: {
       id: result.id,
-      title: data.title,
+      title: generatedTitle,
       l2EntryIds: data.l2EntryIds,
       abstract,
-      category: data.category,
+      category: generatedCategory,
       notionUrl: result.url,
     },
   };
