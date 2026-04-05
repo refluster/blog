@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { GAS_URL } from '../lib/gas-config'
 
 interface L2Entry {
   id: string
@@ -29,14 +30,14 @@ export default function L3Insight() {
 
   async function loadEntries() {
     try {
-      const l2Response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/usercontent', {
+      const l2Response = await fetch('GAS_URL', {
         method: 'POST',
         body: JSON.stringify({ action: 'L2_LIST' }),
       })
       const l2Data = await l2Response.json()
       if (l2Data.success) setL2Entries(l2Data.data || [])
 
-      const l3Response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/usercontent', {
+      const l3Response = await fetch('GAS_URL', {
         method: 'POST',
         body: JSON.stringify({ action: 'L3_LIST' }),
       })
@@ -55,7 +56,7 @@ export default function L3Insight() {
 
     setLoading(true)
     try {
-      const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/usercontent', {
+      const response = await fetch('GAS_URL', {
         method: 'POST',
         body: JSON.stringify({
           action: 'L3_CREATE',

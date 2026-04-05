@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { GAS_URL } from '../lib/gas-config'
 
 interface L1Entry {
   id?: string
@@ -36,7 +37,7 @@ export default function L1Register() {
 
   async function loadEntries() {
     try {
-      const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/usercontent', {
+      const response = await fetch(GAS_URL, {
         method: 'POST',
         body: JSON.stringify({ action: 'L1_LIST' }),
       })
@@ -56,7 +57,7 @@ export default function L1Register() {
 
     setLoading(true)
     try {
-      const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/usercontent', {
+      const response = await fetch(GAS_URL, {
         method: 'POST',
         body: JSON.stringify({ action: 'L1_SAVE', ...form }),
       })
