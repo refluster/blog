@@ -196,7 +196,7 @@ NO text overlay - just design elements. Professional tech/AI industry look.`;
   const payload = {
     prompt,
     n: 1,
-    size: '1200x630',
+    size: '1024x1024',
     quality: 'high',
   };
 
