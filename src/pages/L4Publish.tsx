@@ -6,6 +6,7 @@ interface L3Entry {
   id: string
   title: string
   abstract: string
+  status: 'draft' | 'review' | 'published'
 }
 
 interface L4Entry {
