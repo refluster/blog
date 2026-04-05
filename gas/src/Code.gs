@@ -179,11 +179,24 @@ function githubUpdateManifest(entry, token) {
 }
 
 function githubCreatePost(slug, mdContent, token) {
-  const result = githubRequest('PUT', `/contents/public/posts/${slug}.md`, token, {
+  let payload = {
     message: `Add article: ${slug}`,
     content: Utilities.base64Encode(mdContent),
     branch: 'gh-pages',
-  });
+  };
+
+  // Check if file already exists to get SHA
+  try {
+    const existingFile = githubRequest('GET', `/contents/public/posts/${slug}.md?ref=gh-pages`, token);
+    payload.sha = existingFile.sha;
+  } catch (e) {
+    // File doesn't exist, that's fine - no SHA needed for creation
+    if (!e.message || !e.message.includes('404')) {
+      throw e;
+    }
+  }
+
+  const result = githubRequest('PUT', `/contents/public/posts/${slug}.md`, token, payload);
 
   return {
     url: result.content?.html_url || '',
