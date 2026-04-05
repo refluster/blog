@@ -65,9 +65,9 @@ function notionUpdatePage(pageId, properties, apiKey) {
 // ─── AZURE OPENAI ────────────────────────────────────────────────────────────
 
 function azureGenerateText(prompt, apiKey) {
-  const endpoint = 'https://koh-uehara-ai.openai.azure.com/';
+  const endpoint = 'https://rg-phd-openai-uehara.openai.azure.com/';
   const deploymentId = 'gpt-4o-mini';
-  const apiVersion = '2024-08-01-preview';
+  const apiVersion = '2024-12-01-preview';
   const url = `${endpoint}openai/deployments/${deploymentId}/chat/completions?api-version=${apiVersion}`;
 
   const payload = {
