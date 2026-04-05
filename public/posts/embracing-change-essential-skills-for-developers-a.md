@@ -1,13 +1,14 @@
 ---
-title: "Embracing Change: Essential Skills for Developers and Designers in the Age of AI"
-category: "AI Transformation ? Professional Skills"
+title: "Embracing Change: Essential Skills for Developers and Designers in the AI-Driven Future"
+category: "AI Impact × Professional Skills"
 date: "2026-04-05"
-abstract: "# AI Transformation ? Professional Skills: Navigating the Future of Work
+abstract: "# Navigating the AI Revolution: Shaping Professional Skills for the Future
 
-As artificial intelligence (AI) continues to reshape industries, the roles of professionals across various domains?be it softw"
-notionId: "339d0f0b-e61e-815f-b9d1-f361845253f2"
+As artificial intelligence (AI) continues to permeate various industries, the roles and responsibilities of professionals ac"
+image: "/posts/images/embracing-change-essential-skills-for-developers-a.jpg"
+notionId: "339d0f0b-e61e-8145-a636-fc0152104a0b"
 ---
 
-# AI Transformation ? Professional Skills: Navigating the Future of Work
+# Navigating the AI Revolution: Shaping Professional Skills for the Future
 
-As artificial intelligence (AI) continues to reshape industries, the roles of professionals across various domains?be it softw
+As artificial intelligence (AI) continues to permeate various industries, the roles and responsibilities of professionals ac
