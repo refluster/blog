@@ -391,8 +391,8 @@ function createCorsResponse(data) {
 
 function doPost(e) {
   try {
-    const action = e.parameter.action;
     const data = e.postData.contents ? JSON.parse(e.postData.contents) : {};
+    const action = data.action || e.parameter.action;
     const config = getConfig();
 
     let response;
