@@ -571,6 +571,42 @@ function handleL3List(config) {
   return { success: true, data: entries };
 }
 
+function notionBlocksToMarkdown(blocks) {
+  // Convert Notion blocks back to markdown
+  let markdown = '';
+
+  for (const block of blocks) {
+    try {
+      if (block.type === 'heading_2' && block.heading_2) {
+        const text = block.heading_2.rich_text.map(t => t.plain_text).join('');
+        markdown += '## ' + text + '\n\n';
+      } else if (block.type === 'heading_3' && block.heading_3) {
+        const text = block.heading_3.rich_text.map(t => t.plain_text).join('');
+        markdown += '### ' + text + '\n\n';
+      } else if (block.type === 'paragraph' && block.paragraph) {
+        const text = block.paragraph.rich_text.map(t => t.plain_text).join('');
+        if (text.trim()) {
+          markdown += text + '\n\n';
+        }
+      } else if (block.type === 'bulleted_list_item' && block.bulleted_list_item) {
+        const text = block.bulleted_list_item.rich_text.map(t => t.plain_text).join('');
+        markdown += '- ' + text + '\n';
+      }
+    } catch (e) {
+      // Skip blocks that can't be converted
+      continue;
+    }
+  }
+
+  return markdown;
+}
+
+function notionReadPageBlocks(pageId, apiKey) {
+  // Read all blocks from a Notion page
+  const result = notionRequest('GET', `/blocks/${pageId}/children?page_size=100`, apiKey);
+  return result.results || [];
+}
+
 function handleL4Publish(data, config) {
   const l3Pages = notionQueryDatabase(config.l3_db_id, config.notion_api_key);
   const l3Page = l3Pages.find(p => p.id === data.l3EntryId);
@@ -584,8 +620,12 @@ function handleL4Publish(data, config) {
   const category = l3Page.properties.Category?.rich_text[0]?.plain_text || '';
   const date = new Date().toISOString().split('T')[0];
 
+  // Read full article content from Notion blocks
+  const blocks = notionReadPageBlocks(l3Page.id, config.notion_api_key);
+  const articleContent = notionBlocksToMarkdown(blocks);
+
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50);
-  const mdContent = `---\ntitle: "${title}"\ncategory: "${category}"\ndate: "${date}"\nabstract: "${abstract}"\nimage: "/posts/images/${slug}.jpg"\nnotionId: "${l3Page.id}"\n---\n\n${abstract}\n`;
+  const mdContent = `---\ntitle: "${title}"\ncategory: "${category}"\ndate: "${date}"\nabstract: "${abstract}"\nimage: "/posts/images/${slug}.jpg"\nnotionId: "${l3Page.id}"\n---\n\n${articleContent}`;
 
   const { url, imageUrl } = githubCreatePost(slug, mdContent, config.gh_token, title, category, config.azure_openapi_key);
   githubUpdateManifest({ slug, title, category, date, abstract, image: imageUrl }, config.gh_token);
