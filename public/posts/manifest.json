@@ -126,5 +126,13 @@
     "date": "2026-04-06",
     "abstract": "Spotifyのエンジニアが数ヶ月間一行もコードを書かない、Figmaがデザインプロセスを「誰でも参加できる」ものに変える、DeloitteがSDLCの全工程をAIエージェントが担う未来を描く——これらは別々のニュースではなく、全職種が同じ方向へ同時に移行しているという、一つの現象の三つの断面である。",
     "image": "/posts/images/331d0f0be61e812dad5be523036cb36d.jpg"
+  },
+  {
+    "slug": "33ad0f0be61e814c9c5fc5617b890edb",
+    "title": "AI時代のエンジニアリング進化と学びの未来",
+    "category": "技術革新 × 教育・学習",
+    "date": "2026-04-06",
+    "abstract": "# AI時代のエンジニアリングと倫理的判断の進化\n\n## 要旨\nAI技術の進化はエンジニアの役割を根本的に変える可能性を秘めている。DeloitteやJensen Huangの見解、Claude Code流出の教訓を通じて、これらの現象は共通の原理に基づいていると考えられる。\n\n## 導入\n最近、Deloitteが提唱した「制約なきAI時代」の工学、NVIDIAのJensen Huang氏のAI進",
+    "image": "/posts/images/33ad0f0be61e814c9c5fc5617b890edb.jpg"
   }
 ]
